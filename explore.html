@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bgCollage"></div>
+<div id="bgOverlay"></div>
+<div id="navMount"></div>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Country Explorer</div>
+    <h1>Discover the <em>world</em>,<br>one country at a time</h1>
+    <p class="tagline">Search any country to see its flag, key facts, states, nearby tourist places — save your favourites to your wishlist and book your flight there.</p>
+
+    <form id="searchForm" novalidate>
+      <input type="text" id="countryInput" placeholder="Search a country, e.g. Japan" autocomplete="off">
+      <button type="submit">Explore</button>
+    </form>
+    <div class="field-msg" id="fieldMsg" role="alert"></div>
+    <div class="recent-row" id="recentRow"></div>
+  </header>
+
+  <div id="status"></div>
+
+  <div id="result">
+    <div class="top-grid">
+      <div class="country-card">
+        <img id="flagBanner" class="flag-banner" src="" alt="">
+        <div class="card-body" id="countryBody"></div>
+      </div>
+
+      <div class="states-card">
+        <h3>Explore States / Provinces</h3>
+        <div class="sub" id="statesSub">Click a state to see its cities</div>
+        <div class="states-chip-row" id="statesChipRow"></div>
+        <div class="cities-box" id="citiesBox" style="display:none;">
+          <div class="label" id="citiesLabel">Cities — click one to see its tourist places</div>
+          <div class="cities-chip-row" id="citiesChipRow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="places-section">
+      <div class="section-title">Tourist Places Worth Visiting</div>
+      <div class="places-grid" id="placesGrid"></div>
+    </div>
+
+    <div class="city-places-section" id="cityPlacesSection">
+      <div class="section-title" id="cityPlacesTitle">Tourist Places</div>
+      <div class="city-places-grid" id="cityPlacesGrid"></div>
+    </div>
+
+    <div class="flight-banner" id="flightBanner">
+      <div class="flight-text">
+        <h3>Ready to go?</h3>
+        <p id="flightSubtext">Find flights to this destination.</p>
+      </div>
+      <a href="#" id="flightLink" class="flight-link" target="_blank" rel="noopener noreferrer">✈ Book Flights</a>
+    </div>
+  </div>
+
+  <footer>Data via countries.dev, CountriesNow &amp; Wikipedia GeoSearch · Flight links via Google Flights</footer>
+</div>
+
+<script src="js/common.js"></script>
+<script src="js/explore.js"></script>
+</body>
+</html>

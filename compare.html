@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compare · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bgCollage"></div>
+<div id="bgOverlay"></div>
+<div id="navMount"></div>
+
+<main class="page-wrap">
+  <h1 class="page-title">Compare two countries</h1>
+  <p class="page-sub">Pick two countries to see their facts side by side.</p>
+
+  <form class="cmp-form" id="cmpForm" novalidate>
+    <input type="text" id="cmpA" placeholder="First country, e.g. India" autocomplete="off" aria-label="First country">
+    <input type="text" id="cmpB" placeholder="Second country, e.g. Japan" autocomplete="off" aria-label="Second country">
+    <button type="submit">Compare</button>
+  </form>
+  <div class="field-msg" id="cmpMsg" role="alert" style="text-align:left;"></div>
+
+  <div id="cmpResult"></div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/compare.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bgCollage"></div>
+<div id="bgOverlay"></div>
+<div id="navMount"></div>
+
+<main class="page-wrap">
+  <h1 class="page-title">My Profile</h1>
+  <p class="page-sub">Manage your account and see your travel wishlist at a glance.</p>
+
+  <div class="profile-grid">
+
+    <section class="panel span-2">
+      <h3>Account</h3>
+      <div class="stat-grid">
+        <div><div class="stat-label">Name</div><div class="stat-value" id="pName">—</div></div>
+        <div><div class="stat-label">Email</div><div class="stat-value" id="pEmail">—</div></div>
+        <div><div class="stat-label">Member since</div><div class="stat-value" id="pSince">—</div></div>
+        <div><div class="stat-label">Saved countries</div><div class="stat-value" id="pCountries">0</div></div>
+        <div><div class="stat-label">Saved places</div><div class="stat-value" id="pPlaces">0</div></div>
+        <div><div class="stat-label">Visited</div><div class="stat-value" id="pVisited">0</div></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Edit name</h3>
+      <form id="nameForm" class="auth-form" novalidate>
+        <div class="field">
+          <label for="newName">Full name</label>
+          <input type="text" id="newName" autocomplete="name">
+        </div>
+        <div class="form-msg" id="nameMsg" role="alert"></div>
+        <button type="submit">Save name</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h3>Change password</h3>
+      <form id="pwForm" class="auth-form" novalidate>
+        <div class="field">
+          <label for="oldPw">Current password</label>
+          <input type="password" id="oldPw" autocomplete="current-password">
+        </div>
+        <div class="field">
+          <label for="newPw">New password (min. 6 characters)</label>
+          <input type="password" id="newPw" autocomplete="new-password">
+        </div>
+        <div class="form-msg" id="pwMsg" role="alert"></div>
+        <button type="submit">Update password</button>
+      </form>
+    </section>
+
+    <section class="panel span-2">
+      <h3>Security question</h3>
+      <p class="field-hint" id="secStatus" style="margin-bottom:12px;"></p>
+      <form id="secForm" class="auth-form" novalidate style="max-width:420px;">
+        <div class="field">
+          <label for="secQuestion">Question</label>
+          <select id="secQuestion"></select>
+        </div>
+        <div class="field">
+          <label for="secAnswer">Your answer</label>
+          <input type="text" id="secAnswer" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="secPw">Current password</label>
+          <input type="password" id="secPw" autocomplete="current-password">
+        </div>
+        <div class="form-msg" id="secMsg" role="alert"></div>
+        <button type="submit">Save security question</button>
+      </form>
+    </section>
+
+    <section class="panel danger-panel span-2">
+      <h3>Delete account</h3>
+      <p>This permanently deletes your account and your whole wishlist from this browser. It cannot be undone.</p>
+      <form id="deleteForm" class="auth-form" novalidate style="max-width:380px;">
+        <div class="field">
+          <label for="delPw">Enter your password to confirm</label>
+          <input type="password" id="delPw" autocomplete="current-password">
+        </div>
+        <div class="form-msg" id="delMsg" role="alert"></div>
+        <button type="submit" class="btn-danger" style="background:#c4453a;color:#fff;">Delete my account</button>
+      </form>
+    </section>
+
+  </div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

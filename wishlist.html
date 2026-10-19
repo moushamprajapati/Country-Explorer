@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Wishlist · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bgCollage"></div>
+<div id="bgOverlay"></div>
+<div id="navMount"></div>
+
+<main class="page-wrap">
+  <h1 class="page-title">My Wishlist</h1>
+  <p class="page-sub" id="wishSummary">Countries and places you saved.</p>
+
+  <div class="progress-box hidden" id="progressBox">
+    <div class="p-label"><span id="progressText">0 of 0 visited</span><span id="progressPct">0%</span></div>
+    <div class="bar"><span id="progressFill" style="width:0%"></span></div>
+  </div>
+
+  <div class="wish-toolbar" id="wishToolbar">
+    <div class="pill-row" id="filterRow">
+      <button type="button" class="pill active" data-filter="all">All</button>
+      <button type="button" class="pill" data-filter="country">Countries</button>
+      <button type="button" class="pill" data-filter="place">Places</button>
+      <button type="button" class="pill" data-filter="tovisit">Want to visit</button>
+      <button type="button" class="pill" data-filter="visited">Visited</button>
+    </div>
+    <input type="search" id="wishSearch" class="wish-search" placeholder="Search your wishlist" aria-label="Search your wishlist">
+    <button type="button" id="clearAllBtn" class="btn btn-ghost">Delete all</button>
+  </div>
+
+  <div class="wish-grid" id="wishGrid"></div>
+
+  <div class="empty-state hidden" id="emptyState">
+    <h3 id="emptyTitle">Your wishlist is empty</h3>
+    <p id="emptyText">Tap the heart on any country or tourist place to save it here.</p>
+    <a class="btn btn-brass" href="explore.html" id="emptyLink">Start exploring</a>
+  </div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/wishlist.js"></script>
+</body>
+</html>

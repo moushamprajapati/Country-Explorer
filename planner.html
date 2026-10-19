@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Planner · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bgCollage"></div>
+<div id="bgOverlay"></div>
+<div id="navMount"></div>
+
+<main class="page-wrap">
+  <h1 class="page-title">Trip budget planner</h1>
+  <p class="page-sub">Estimate what your trip will cost and save the plan.</p>
+
+  <div class="planner-grid">
+    <section class="panel">
+      <h3>Trip details</h3>
+      <form id="planForm" class="auth-form" novalidate>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="pDest">Destination</label>
+            <input type="text" id="pDest" list="destList" placeholder="Type a country or pick from your wishlist" autocomplete="off">
+            <datalist id="destList"></datalist>
+          </div>
+          <div class="field">
+            <label for="pDays">Number of days</label>
+            <input type="number" id="pDays" min="1" max="365" value="7">
+          </div>
+          <div class="field">
+            <label for="pPeople">Travellers</label>
+            <input type="number" id="pPeople" min="1" max="50" value="1">
+          </div>
+          <div class="field">
+            <label for="pCur">Currency</label>
+            <select id="pCur">
+              <option value="₹">₹ Rupees</option>
+              <option value="$">$ Dollars</option>
+              <option value="€">€ Euros</option>
+              <option value="£">£ Pounds</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="pFlight">Flight (per person)</label>
+            <input type="number" id="pFlight" min="0" value="0">
+          </div>
+          <div class="field">
+            <label for="pHotel">Hotel (per night, total)</label>
+            <input type="number" id="pHotel" min="0" value="0">
+          </div>
+          <div class="field">
+            <label for="pFood">Food (per day, per person)</label>
+            <input type="number" id="pFood" min="0" value="0">
+          </div>
+          <div class="field">
+            <label for="pTransport">Local transport (per day, total)</label>
+            <input type="number" id="pTransport" min="0" value="0">
+          </div>
+          <div class="field">
+            <label for="pActivities">Activities (per day, per person)</label>
+            <input type="number" id="pActivities" min="0" value="0">
+          </div>
+          <div class="field full">
+            <label for="pExtra">Extra buffer for emergencies (%)</label>
+            <input type="number" id="pExtra" min="0" max="100" value="10">
+          </div>
+        </div>
+        <div class="form-msg" id="planMsg" role="alert"></div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h3>Estimated cost</h3>
+      <div id="summary"></div>
+      <button type="button" id="savePlanBtn" class="btn btn-brass btn-wide" style="margin-top:16px;">Save this plan</button>
+    </section>
+  </div>
+
+  <h2 class="section-title" style="margin-top:44px;">Saved plans</h2>
+  <div class="plan-list" id="planList"></div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/planner.js"></script>
+</body>
+</html>

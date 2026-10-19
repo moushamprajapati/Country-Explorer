@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="bgCollage"></div>
+<div id="bgOverlay"></div>
+<div id="navMount"></div>
+
+<main class="page-wrap">
+  <h1 class="page-title">Admin dashboard</h1>
+  <p class="page-sub">See everyone who registered and manage their accounts.</p>
+
+  <div class="stat-cards" id="statCards"></div>
+
+  <div class="profile-grid">
+    <section class="panel span-2">
+      <h3>Registered users</h3>
+      <div class="wish-toolbar" style="margin:0 0 14px;">
+        <input type="search" id="userSearch" class="wish-search" style="background:#f4efe3;" placeholder="Search by name or email" aria-label="Search users">
+      </div>
+      <div class="table-scroll">
+        <table class="admin-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Saved</th><th>Visited</th><th></th></tr></thead>
+          <tbody id="userRows"></tbody>
+        </table>
+      </div>
+      <p class="empty-note hidden" id="noUsers" style="color:#8a8578;margin-top:14px;">No users found.</p>
+    </section>
+
+    <section class="panel span-2">
+      <h3>Most saved countries</h3>
+      <ul class="top-list" id="topList"></ul>
+    </section>
+  </div>
+</main>
+
+<script src="js/common.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

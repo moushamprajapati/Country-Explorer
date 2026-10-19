@@ -3,893 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Country Explorer</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&display=swap');
-
-  :root {
-    --teal: #0f3d3a;
-    --teal-light: #1f5a53;
-    --brass: #e0a458;
-    --ink: #17211f;
-    --white: #ffffff;
-    --error: #e5695f;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Space Grotesk', sans-serif;
-    color: var(--ink);
-    min-height: 100vh;
-    position: relative;
-  }
-
-  /* ---------- Photo collage background ---------- */
-  #bgCollage {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 2px;
-  }
-  #bgCollage img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: saturate(1.05);
-  }
-  #bgOverlay {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(180deg, rgba(15,61,58,0.90) 0%, rgba(15,61,58,0.80) 35%, rgba(15,61,58,0.94) 100%);
-    backdrop-filter: blur(1px);
-  }
-
-  .wrap { max-width: 1240px; margin: 0 auto; padding: 56px 32px 110px; }
-
-  header { text-align: center; margin-bottom: 40px; }
-
-  .eyebrow {
-    font-size: 12px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--brass);
-    font-weight: 600;
-  }
-
-  h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: clamp(42px, 6vw, 68px);
-    color: var(--white);
-    margin-top: 12px;
-    line-height: 1.03;
-  }
-  h1 em { font-style: italic; font-weight: 300; color: var(--brass); }
-
-  .tagline {
-    margin-top: 16px;
-    color: rgba(255,255,255,0.75);
-    font-size: 16px;
-    max-width: 560px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  form {
-    margin-top: 34px;
-    display: flex;
-    gap: 10px;
-    max-width: 560px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  #countryInput {
-    flex: 1;
-    background: rgba(255,255,255,0.95);
-    border: none;
-    outline: none;
-    border-radius: 10px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 16px;
-    padding: 16px 20px;
-    color: var(--ink);
-  }
-  #countryInput::placeholder { color: #9a9a92; }
-
-  button[type="submit"] {
-    background: var(--brass);
-    color: var(--teal);
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.03em;
-    padding: 16px 30px;
-    cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
-  }
-  button[type="submit"]:hover { background: #ecb674; transform: translateY(-1px); }
-  button[type="submit"]:focus-visible,
-  #countryInput:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-
-  .field-msg {
-    text-align: center;
-    min-height: 22px;
-    margin-top: 10px;
-    font-size: 13px;
-    color: #ffb4ac;
-  }
-
-  #status {
-    text-align: center;
-    margin-top: 30px;
-    color: rgba(255,255,255,0.75);
-    font-size: 14px;
-    display: none;
-  }
-  #status.active { display: block; }
-
-  #result { margin-top: 44px; display: none; }
-  #result.active { display: block; animation: rise 0.5s ease both; }
-  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ---------- Top grid: flag/stats + states side by side on wide screens ---------- */
-  .top-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 24px;
-    align-items: start;
-  }
-  @media (max-width: 920px) {
-    .top-grid { grid-template-columns: 1fr; }
-  }
-
-  .country-card {
-    background: var(--white);
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  }
-  .flag-banner {
-    width: 100%;
-    height: 220px;
-    object-fit: cover;
-    display: block;
-    background: #e9e4d6;
-  }
-  .card-body { padding: 30px 34px 34px; }
-  .country-name {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 36px;
-    color: var(--teal);
-  }
-  .stat-grid {
-    margin-top: 24px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 20px 24px;
-    border-top: 1px solid #ece7db;
-    padding-top: 22px;
-  }
-  .stat-label {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--brass);
-    font-weight: 700;
-  }
-  .stat-value {
-    font-family: 'Fraunces', serif;
-    font-size: 18px;
-    margin-top: 4px;
-    color: var(--ink);
-  }
-
-  /* ---------- States explorer panel ---------- */
-  .states-card {
-    background: var(--white);
-    border-radius: 18px;
-    padding: 28px 30px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-    min-height: 100%;
-  }
-  .states-card h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 21px;
-    color: var(--teal);
-    margin-bottom: 4px;
-  }
-  .states-card .sub {
-    font-size: 12.5px;
-    color: #8a8578;
-    margin-bottom: 16px;
-  }
-  .states-chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-height: 230px;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-  .state-chip {
-    background: #f4efe3;
-    border: 1px solid #e6dfcc;
-    color: var(--ink);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 7px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .state-chip:hover { background: var(--brass); color: var(--white); border-color: var(--brass); }
-  .state-chip.active { background: var(--teal); color: var(--white); border-color: var(--teal); }
-
-  .cities-box {
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px solid #ece7db;
-  }
-  .cities-box .label {
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--brass);
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .cities-chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    max-height: 160px;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-  .city-chip {
-    background: #eef3f1;
-    border: 1px solid #dde6e2;
-    color: var(--teal);
-    font-size: 12.5px;
-    font-weight: 500;
-    padding: 6px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .city-chip:hover { background: var(--teal); color: var(--white); border-color: var(--teal); }
-  .city-chip.active { background: var(--brass); color: var(--white); border-color: var(--brass); }
-
-  .city-places-section {
-    margin-top: 44px;
-    display: none;
-  }
-  .city-places-section.active { display: block; }
-  .city-places-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 18px;
-  }
-
-  /* ---------- Tourist places ---------- */
-  .places-section { margin-top: 44px; }
-  .section-title {
-    font-family: 'Fraunces', serif;
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 20px;
-  }
-  .places-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px;
-  }
-  .place-card {
-    background: var(--white);
-    border-radius: 14px;
-    overflow: hidden;
-    text-decoration: none;
-    color: var(--ink);
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.25);
-    transition: transform 0.2s ease;
-  }
-  .place-card:hover { transform: translateY(-4px); }
-  .place-thumb {
-    width: 100%;
-    height: 160px;
-    object-fit: cover;
-    background: #e9e4d6;
-    display: block;
-  }
-  .place-thumb-fallback {
-    width: 100%;
-    height: 160px;
-    background: #e9e4d6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    color: #a19d8e;
-    font-size: 13px;
-  }
-  .place-body { padding: 16px 18px; }
-  .place-title {
-    font-family: 'Fraunces', serif;
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 1.25;
-  }
-  .place-dist {
-    font-size: 11px;
-    color: var(--brass);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 6px;
-    font-weight: 600;
-  }
-
-  .empty-note { color: rgba(255,255,255,0.8); font-style: italic; font-size: 14px; }
-
-  /* ---------- Flight booking banner ---------- */
-  .flight-banner {
-    margin-top: 48px;
-    background: linear-gradient(135deg, var(--brass), #c98a3f);
-    border-radius: 16px;
-    padding: 30px 34px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-  .flight-text h3 {
-    font-family: 'Fraunces', serif;
-    font-size: 22px;
-    color: var(--teal);
-  }
-  .flight-text p {
-    font-size: 14px;
-    color: #3a2c15;
-    margin-top: 4px;
-  }
-  .flight-link {
-    background: var(--teal);
-    color: var(--white);
-    text-decoration: none;
-    padding: 14px 26px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 14px;
-    white-space: nowrap;
-    transition: background 0.2s ease;
-  }
-  .flight-link:hover { background: var(--teal-light); }
-
-  footer {
-    margin-top: 64px;
-    text-align: center;
-    font-size: 12px;
-    color: rgba(255,255,255,0.55);
-  }
-
-  @media (max-width: 560px) {
-    form { flex-direction: column; }
-    .flight-banner { flex-direction: column; align-items: stretch; text-align: center; }
-    #bgCollage { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); }
-  }
-</style>
+<title>Log in · Country Explorer</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div id="bgCollage"></div>
 <div id="bgOverlay"></div>
 
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Country Explorer</div>
-    <h1>Discover the <em>world</em>,<br>one country at a time</h1>
-    <p class="tagline">Search any country to see its flag, key facts, states, nearby tourist places — and book your flight there.</p>
+<main class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="eyebrow">Country Explorer</div>
+      <h1>Welcome</h1>
+      <p>Log in to explore countries and save your dream destinations.</p>
+    </div>
 
-    <form id="searchForm" novalidate>
-      <input type="text" id="countryInput" placeholder="Search a country, e.g. Japan" autocomplete="off">
-      <button type="submit">Explore</button>
+    <div class="tabs" role="tablist">
+      <button type="button" id="tabLogin" class="active" role="tab">Log in</button>
+      <button type="button" id="tabRegister" role="tab">Register</button>
+    </div>
+
+    <!-- Login form -->
+    <form id="loginForm" class="auth-form" novalidate>
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" autocomplete="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Your password">
+      </div>
+      <label class="show-pw"><input type="checkbox" id="showLoginPw"> Show password</label>
+      <div class="form-msg" id="loginMsg" role="alert"></div>
+      <button type="submit">Log in</button>
+      <button type="button" class="link-btn" id="forgotLink">Forgot password?</button>
     </form>
-    <div class="field-msg" id="fieldMsg" role="alert"></div>
-  </header>
 
-  <div id="status"></div>
-
-  <div id="result">
-    <div class="top-grid">
-      <div class="country-card">
-        <img id="flagBanner" class="flag-banner" src="" alt="">
-        <div class="card-body" id="countryBody"></div>
+    <!-- Register form -->
+    <form id="registerForm" class="auth-form hidden" novalidate>
+      <div class="field">
+        <label for="regName">Full name</label>
+        <input type="text" id="regName" autocomplete="name" placeholder="Your name">
       </div>
+      <div class="field">
+        <label for="regEmail">Email</label>
+        <input type="email" id="regEmail" autocomplete="email" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label for="regPassword">Password (min. 6 characters)</label>
+        <input type="password" id="regPassword" autocomplete="new-password" placeholder="Create a password">
+      </div>
+      <div class="field">
+        <label for="regConfirm">Confirm password</label>
+        <input type="password" id="regConfirm" autocomplete="new-password" placeholder="Type it again">
+      </div>
+      <div class="field">
+        <label for="regQuestion">Security question (for password reset)</label>
+        <select id="regQuestion"></select>
+      </div>
+      <div class="field">
+        <label for="regAnswer">Your answer</label>
+        <input type="text" id="regAnswer" autocomplete="off" placeholder="Answer to the question above">
+      </div>
+      <div class="form-msg" id="registerMsg" role="alert"></div>
+      <button type="submit">Create account</button>
+    </form>
 
-      <div class="states-card">
-        <h3>Explore States / Provinces</h3>
-        <div class="sub" id="statesSub">Click a state to see its cities</div>
-        <div class="states-chip-row" id="statesChipRow"></div>
-        <div class="cities-box" id="citiesBox" style="display:none;">
-          <div class="label" id="citiesLabel">Cities — click one to see its tourist places</div>
-          <div class="cities-chip-row" id="citiesChipRow"></div>
+    <!-- Forgot password form (2 steps) -->
+    <form id="forgotForm" class="auth-form hidden" novalidate>
+      <div class="field">
+        <label for="fpEmail">Account email</label>
+        <input type="email" id="fpEmail" autocomplete="email" placeholder="you@example.com">
+      </div>
+      <div id="fpStep2" class="auth-form hidden">
+        <div class="field">
+          <label id="fpQuestionLabel" for="fpAnswer">Security question</label>
+          <input type="text" id="fpAnswer" autocomplete="off" placeholder="Your answer">
+        </div>
+        <div class="field">
+          <label for="fpNewPw">New password (min. 6 characters)</label>
+          <input type="password" id="fpNewPw" autocomplete="new-password">
         </div>
       </div>
-    </div>
-
-    <div class="places-section">
-      <div class="section-title">Tourist Places Worth Visiting</div>
-      <div class="places-grid" id="placesGrid"></div>
-    </div>
-
-    <div class="city-places-section" id="cityPlacesSection">
-      <div class="section-title" id="cityPlacesTitle">Tourist Places</div>
-      <div class="city-places-grid" id="cityPlacesGrid"></div>
-    </div>
-
-    <div class="flight-banner" id="flightBanner">
-      <div class="flight-text">
-        <h3>Ready to go?</h3>
-        <p id="flightSubtext">Find flights to this destination.</p>
-      </div>
-      <a href="#" id="flightLink" class="flight-link" target="_blank" rel="noopener noreferrer">✈ Book Flights</a>
-    </div>
+      <div class="form-msg" id="fpMsg" role="alert"></div>
+      <button type="submit" id="fpBtn">Find my account</button>
+      <button type="button" class="link-btn" id="backToLogin">Back to log in</button>
+    </form>
   </div>
+</main>
 
-  <footer>Data via countries.dev, CountriesNow &amp; Wikipedia GeoSearch · Flight links via Google Flights</footer>
-</div>
-
-<script>
-const form = document.getElementById('searchForm');
-const input = document.getElementById('countryInput');
-const fieldMsg = document.getElementById('fieldMsg');
-const statusBox = document.getElementById('status');
-const resultBox = document.getElementById('result');
-const flagBanner = document.getElementById('flagBanner');
-const countryBody = document.getElementById('countryBody');
-const placesGrid = document.getElementById('placesGrid');
-const bgCollage = document.getElementById('bgCollage');
-const flightLink = document.getElementById('flightLink');
-const flightSubtext = document.getElementById('flightSubtext');
-const statesChipRow = document.getElementById('statesChipRow');
-const statesSub = document.getElementById('statesSub');
-const citiesBox = document.getElementById('citiesBox');
-const citiesChipRow = document.getElementById('citiesChipRow');
-const cityPlacesSection = document.getElementById('cityPlacesSection');
-const cityPlacesTitle = document.getElementById('cityPlacesTitle');
-const cityPlacesGrid = document.getElementById('cityPlacesGrid');
-
-// Common alternate names people type, mapped to the country API's official name.
-// All comparisons are lowercase, so letter case never matters.
-const NAME_ALIASES = {
-  'south korea': 'Korea (Republic of)',
-  'north korea': "Korea (Democratic People's Republic of)",
-  'usa': 'United States of America',
-  'us': 'United States of America',
-  'america': 'United States of America',
-  'uk': 'United Kingdom of Great Britain and Northern Ireland',
-  'britain': 'United Kingdom of Great Britain and Northern Ireland',
-  'england': 'United Kingdom of Great Britain and Northern Ireland',
-  'russia': 'Russian Federation',
-  'iran': 'Iran (Islamic Republic of)',
-  'laos': "Lao People's Democratic Republic",
-  'syria': 'Syrian Arab Republic',
-  'venezuela': 'Venezuela (Bolivarian Republic of)',
-  'bolivia': 'Bolivia (Plurinational State of)',
-  'tanzania': 'Tanzania, United Republic of',
-  'moldova': 'Moldova (Republic of)',
-  'vatican': 'Vatican City',
-  'ivory coast': 'Ivory Coast',
-  'czechia': 'Czech Republic',
-  'macedonia': 'North Macedonia'
-};
-
-const DEFAULT_BG = [
-  'https://picsum.photos/seed/travel1/500/500','https://picsum.photos/seed/travel2/500/500',
-  'https://picsum.photos/seed/travel3/500/500','https://picsum.photos/seed/travel4/500/500',
-  'https://picsum.photos/seed/travel5/500/500','https://picsum.photos/seed/travel6/500/500',
-  'https://picsum.photos/seed/travel7/500/500','https://picsum.photos/seed/travel8/500/500',
-  'https://picsum.photos/seed/travel9/500/500','https://picsum.photos/seed/travel10/500/500',
-  'https://picsum.photos/seed/travel11/500/500','https://picsum.photos/seed/travel12/500/500',
-  'https://picsum.photos/seed/travel13/500/500','https://picsum.photos/seed/travel14/500/500',
-  'https://picsum.photos/seed/travel15/500/500','https://picsum.photos/seed/travel16/500/500',
-  'https://picsum.photos/seed/travel17/500/500','https://picsum.photos/seed/travel18/500/500',
-];
-
-function setCollage(urls) {
-  bgCollage.innerHTML = '';
-  urls.forEach(url => {
-    const img = document.createElement('img');
-    img.src = url;
-    img.alt = '';
-    bgCollage.appendChild(img);
-  });
-}
-setCollage(DEFAULT_BG);
-
-function formatNumber(n) {
-  return new Intl.NumberFormat('en-US').format(n);
-}
-
-function setStatus(msg) {
-  if (!msg) { statusBox.classList.remove('active'); statusBox.textContent = ''; return; }
-  statusBox.classList.add('active');
-  statusBox.textContent = msg;
-}
-
-function pickBestMatch(data, typedName) {
-  const lowerTyped = typedName.toLowerCase();
-  let match = data.find(item => item.name.toLowerCase() === lowerTyped);
-  if (match) return match;
-
-  const startsWith = data.filter(item => item.name.toLowerCase().startsWith(lowerTyped));
-  if (startsWith.length > 0) {
-    startsWith.sort((a, b) => a.name.length - b.name.length);
-    return startsWith[0];
-  }
-  return data[0];
-}
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  fieldMsg.textContent = '';
-
-  const rawQuery = input.value.trim();
-
-  if (rawQuery.length === 0) {
-    fieldMsg.textContent = 'Enter a country name to continue.';
-    input.focus();
-    return;
-  }
-  if (rawQuery.length < 3) {
-    fieldMsg.textContent = 'Country name should be at least 3 characters.';
-    input.focus();
-    return;
-  }
-  if (!/^[a-zA-Z\s.'-]+$/.test(rawQuery)) {
-    fieldMsg.textContent = 'Please use letters only — no numbers or symbols.';
-    input.focus();
-    return;
-  }
-
-  const query = NAME_ALIASES[rawQuery.toLowerCase()] || rawQuery;
-
-  resultBox.classList.remove('active');
-  citiesBox.style.display = 'none';
-  setStatus('Looking up ' + rawQuery + ' …');
-
-  try {
-    const countryRes = await fetch('https://countries.dev/name/' + encodeURIComponent(query));
-    if (!countryRes.ok) throw new Error('not-found');
-    const data = await countryRes.json();
-    if (!Array.isArray(data) || data.length === 0) throw new Error('not-found');
-
-    const c = pickBestMatch(data, query);
-
-    renderCountry(c);
-    setStatus('');
-    resultBox.classList.add('active');
-
-    const flightTarget = c.capital || c.name;
-    flightLink.href = 'https://www.google.com/travel/flights?q=' + encodeURIComponent('Flights to ' + flightTarget);
-    flightSubtext.textContent = 'Search live flight options to ' + flightTarget + '.';
-
-    loadStates(c.name);
-
-    // Use the CAPITAL CITY's own coordinates for finding tourist places —
-    // not the country's overall center. For large countries (India, Russia,
-    // USA, Brazil...) the geographic center can be far from the capital,
-    // which previously caused "no places found" for exactly these cases.
-    placesGrid.innerHTML = '<p class="empty-note">Finding landmarks near the capital…</p>';
-    const capitalCoords = await getCapitalCoords(c.capital, c.latlng);
-    if (capitalCoords) {
-      loadPlaces(capitalCoords[0], capitalCoords[1], c.name);
-    } else {
-      placesGrid.innerHTML = '<p class="empty-note">No coordinates available to search nearby landmarks.</p>';
-    }
-
-  } catch (err) {
-    setStatus('');
-    resultBox.classList.remove('active');
-    fieldMsg.textContent = 'Couldn\'t find a country called "' + rawQuery + '". Check the spelling and try again.';
-  }
-});
-
-function renderCountry(c) {
-  const currencies = c.currencies ? c.currencies.map(cur => cur.name + ' (' + cur.symbol + ')').join(', ') : '—';
-  const languages = c.languages ? c.languages.map(l => l.name).join(', ') : '—';
-  const capital = c.capital || '—';
-  const flagUrl = c.flags && c.flags.svg ? c.flags.svg : '';
-
-  flagBanner.src = flagUrl;
-  flagBanner.alt = 'Flag of ' + c.name;
-
-  countryBody.innerHTML = `
-    <div class="country-name">${c.name}</div>
-    <div class="stat-grid">
-      <div><div class="stat-label">Capital</div><div class="stat-value">${capital}</div></div>
-      <div><div class="stat-label">Region</div><div class="stat-value">${c.region || '—'}${c.subregion ? ' · ' + c.subregion : ''}</div></div>
-      <div><div class="stat-label">Population</div><div class="stat-value">${c.population ? formatNumber(c.population) : '—'}</div></div>
-      <div><div class="stat-label">Currency</div><div class="stat-value">${currencies}</div></div>
-      <div><div class="stat-label">Languages</div><div class="stat-value">${languages}</div></div>
-    </div>
-  `;
-}
-
-// The country-data API (countries.dev) returns long OFFICIAL names
-// ("United States of America", "Korea (Republic of)"), but the free
-// states API (CountriesNow) stores many countries under their SHORT,
-// everyday name ("United States", "South Korea"). A mismatch here makes
-// the states lookup come back empty even though the data genuinely exists.
-// This map translates the official name to the short name CountriesNow expects.
-const STATE_API_NAME_OVERRIDES = {
-  'United States of America': 'United States',
-  'United Kingdom of Great Britain and Northern Ireland': 'United Kingdom',
-  'Korea (Republic of)': 'South Korea',
-  "Korea (Democratic People's Republic of)": 'North Korea',
-  'Russian Federation': 'Russia',
-  'Iran (Islamic Republic of)': 'Iran',
-  "Lao People's Democratic Republic": 'Laos',
-  'Syrian Arab Republic': 'Syria',
-  'Venezuela (Bolivarian Republic of)': 'Venezuela',
-  'Bolivia (Plurinational State of)': 'Bolivia',
-  'Tanzania, United Republic of': 'Tanzania',
-  'Moldova (Republic of)': 'Moldova',
-  'Czech Republic': 'Czechia',
-  'Vietnam': 'Viet Nam',
-};
-
-// Tries one country name against the states API. Returns the states array
-// on success, or null if that name didn't match anything.
-async function tryFetchStates(name) {
-  try {
-    const res = await fetch('https://countriesnow.space/api/v0.1/countries/states', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ country: name })
-    });
-    const data = await res.json();
-    if (!data.error && data.data && data.data.states && data.data.states.length > 0) {
-      return data.data.states;
-    }
-  } catch (err) {
-    // ignore and let the caller try the next candidate name
-  }
-  return null;
-}
-
-// --- States / Provinces explorer (CountriesNow API — free, no key) ---
-async function loadStates(countryName) {
-  statesChipRow.innerHTML = '<p class="empty-note" style="color:#8a8578;">Loading states…</p>';
-  citiesBox.style.display = 'none';
-  statesSub.textContent = 'Click a state to see its cities';
-
-  // Build a list of name variants to try, in order: the official name first,
-  // then any known short-name override, then a version with any "(...)"
-  // part removed (handles cases we haven't explicitly mapped).
-  const candidates = [countryName];
-  if (STATE_API_NAME_OVERRIDES[countryName]) {
-    candidates.push(STATE_API_NAME_OVERRIDES[countryName]);
-  }
-  const stripped = countryName.replace(/\s*\(.*?\)/, '').trim();
-  if (stripped && stripped !== countryName && !candidates.includes(stripped)) {
-    candidates.push(stripped);
-  }
-
-  let states = null;
-  let resolvedName = countryName;
-  for (const candidate of candidates) {
-    states = await tryFetchStates(candidate);
-    if (states) { resolvedName = candidate; break; }
-  }
-
-  if (!states) {
-    statesChipRow.innerHTML = '<p class="empty-note" style="color:#8a8578;">No state-level data available for this country.</p>';
-    return;
-  }
-
-  statesChipRow.innerHTML = '';
-  states.forEach(state => {
-    const chip = document.createElement('button');
-    chip.type = 'button';
-    chip.className = 'state-chip';
-    chip.textContent = state.name;
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.state-chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      // Use resolvedName here — the name variant that actually matched —
-      // so the cities lookup below uses the same name the states lookup did.
-      loadCities(resolvedName, state.name);
-    });
-    statesChipRow.appendChild(chip);
-  });
-}
-
-async function loadCities(countryName, stateName) {
-  citiesBox.style.display = 'block';
-  citiesChipRow.innerHTML = '<p class="empty-note" style="color:#8a8578;">Loading cities…</p>';
-  cityPlacesSection.classList.remove('active');
-
-  try {
-    const res = await fetch('https://countriesnow.space/api/v0.1/countries/state/cities', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ country: countryName, state: stateName })
-    });
-    const data = await res.json();
-
-    if (data.error || !data.data || data.data.length === 0) {
-      citiesChipRow.innerHTML = '<p class="empty-note" style="color:#8a8578;">No city data available for this state.</p>';
-      return;
-    }
-
-    citiesChipRow.innerHTML = '';
-    data.data.forEach(cityName => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'city-chip';
-      chip.textContent = cityName;
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('.city-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        loadCityPlaces(cityName, countryName);
-      });
-      citiesChipRow.appendChild(chip);
-    });
-
-  } catch (err) {
-    citiesChipRow.innerHTML = '<p class="empty-note" style="color:#8a8578;">Could not load cities right now.</p>';
-  }
-}
-
-// When a city is clicked: find that city's real-world coordinates, then
-// search for tourist places near it — same approach used for the capital.
-async function loadCityPlaces(cityName, countryName) {
-  cityPlacesSection.classList.add('active');
-  cityPlacesTitle.textContent = 'Tourist Places in ' + cityName;
-  cityPlacesGrid.innerHTML = '<p class="empty-note" style="color:#8a8578;">Finding landmarks near ' + cityName + '…</p>';
-  cityPlacesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  const coords = await getCoordsForPlace(cityName, countryName);
-
-  if (!coords) {
-    cityPlacesGrid.innerHTML = '<p class="empty-note" style="color:#8a8578;">Couldn\'t find location data for ' + cityName + '.</p>';
-    return;
-  }
-
-  await loadPlacesInto(coords[0], coords[1], cityName, cityPlacesGrid, false);
-}
-
-// More robust coordinate lookup for city names, which often don't match a
-// Wikipedia page title exactly (e.g. small towns, or names shared by
-// several places). Step 1: SEARCH Wikipedia for the best-matching article
-// using the city + country name together. Step 2: fetch that article's
-// coordinates. This two-step approach resolves far more cities correctly
-// than guessing an exact page title directly.
-async function getCoordsForPlace(placeName, countryContext) {
-  try {
-    const searchQuery = countryContext ? placeName + ' ' + countryContext : placeName;
-    const searchUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=' + encodeURIComponent(searchQuery) + '&srlimit=1&format=json&origin=*';
-    const searchRes = await fetch(searchUrl);
-    const searchData = await searchRes.json();
-    const bestTitle = (searchData.query && searchData.query.search && searchData.query.search[0])
-      ? searchData.query.search[0].title
-      : placeName;
-
-    const coordUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=coordinates&titles=' + encodeURIComponent(bestTitle) + '&format=json&origin=*';
-    const coordRes = await fetch(coordUrl);
-    const coordData = await coordRes.json();
-    const page = Object.values(coordData.query.pages)[0];
-    if (page && page.coordinates && page.coordinates.length > 0) {
-      return [page.coordinates[0].lat, page.coordinates[0].lon];
-    }
-  } catch (err) {
-    // falls through to null below
-  }
-  return null;
-}
-
-// Looks up the real coordinates of the capital CITY itself (via Wikipedia),
-// instead of using the country's overall center point. Falls back to the
-// country's coordinates only if the capital's page/coordinates can't be found.
-async function getCapitalCoords(capitalName, countryLatlng) {
-  if (capitalName) {
-    try {
-      const url = 'https://en.wikipedia.org/w/api.php?action=query&prop=coordinates&titles=' + encodeURIComponent(capitalName) + '&format=json&origin=*';
-      const res = await fetch(url);
-      const data = await res.json();
-      const page = Object.values(data.query.pages)[0];
-      if (page && page.coordinates && page.coordinates.length > 0) {
-        return [page.coordinates[0].lat, page.coordinates[0].lon];
-      }
-    } catch (err) {
-      // fall through to the country-level fallback below
-    }
-  }
-  return (countryLatlng && countryLatlng.length === 2) ? countryLatlng : null;
-}
-
-// Shared place-finder — used for BOTH the capital (main results) and any
-// city clicked under a state. `gridEl` is which grid to fill in, `label` is
-// shown in each card's caption, and `updateBg` controls whether this call
-// is allowed to refresh the page's background photo collage.
-async function loadPlacesInto(lat, lon, label, gridEl, updateBg) {
-  try {
-    // gsradius is capped at 10000m (10km) by Wikipedia's API — that's the
-    // maximum allowed, so we raise gslimit instead to surface more results
-    // within that radius.
-    const geoUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=' + lat + '%7C' + lon + '&gsradius=10000&gslimit=30&format=json&origin=*';
-    const geoRes = await fetch(geoUrl);
-    const geoData = await geoRes.json();
-    const places = geoData.query.geosearch;
-
-    if (!places || places.length === 0) {
-      gridEl.innerHTML = '<p class="empty-note">No notable landmarks found nearby ' + label + '.</p>';
-      return;
-    }
-
-    const titles = places.map(p => p.title).join('|');
-    const detailUrl = 'https://en.wikipedia.org/w/api.php?action=query&prop=pageimages%7Cextracts&exintro=1&explaintext=1&exsentences=1&piprop=thumbnail&pithumbsize=400&titles=' + encodeURIComponent(titles) + '&format=json&origin=*';
-    const detailRes = await fetch(detailUrl);
-    const detailData = await detailRes.json();
-    const pages = detailData.query.pages;
-
-    gridEl.innerHTML = '';
-    const collageImages = [];
-
-    places.forEach(p => {
-      const page = Object.values(pages).find(pg => pg.title === p.title);
-      const thumb = page && page.thumbnail ? page.thumbnail.source : null;
-      if (thumb) collageImages.push(thumb);
-
-      const dist = p.dist < 1000 ? Math.round(p.dist) + ' m away' : (p.dist / 1000).toFixed(1) + ' km away';
-
-      const card = document.createElement('a');
-      card.className = 'place-card';
-      card.href = 'https://en.wikipedia.org/wiki/' + encodeURIComponent(p.title.replace(/ /g, '_'));
-      card.target = '_blank';
-      card.rel = 'noopener noreferrer';
-
-      card.innerHTML = `
-        ${thumb ? `<img class="place-thumb" src="${thumb}" alt="${p.title}">` : `<div class="place-thumb-fallback">No image</div>`}
-        <div class="place-body">
-          <div class="place-title">${p.title}</div>
-          <div class="place-dist">${dist} · near ${label}</div>
-        </div>
-      `;
-      gridEl.appendChild(card);
-    });
-
-    if (updateBg && collageImages.length > 0) {
-      const filled = [];
-      while (filled.length < 18) {
-        filled.push(collageImages[filled.length % collageImages.length]);
-      }
-      setCollage(filled);
-    }
-
-  } catch (err) {
-    gridEl.innerHTML = '<p class="empty-note">Couldn\'t load landmarks right now.</p>';
-  }
-}
-
-// Wrapper kept for the main capital-level search (updates the background collage).
-async function loadPlaces(lat, lon, countryName) {
-  await loadPlacesInto(lat, lon, countryName + "'s capital", placesGrid, true);
-}
-</script>
-
+<script src="js/common.js"></script>
+<script src="js/login.js"></script>
 </body>
 </html>
